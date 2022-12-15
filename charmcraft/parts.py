@@ -26,6 +26,7 @@ import pydantic
 from craft_cli import emit, CraftError
 from craft_parts import LifecycleManager, Step, plugins, callbacks
 from craft_parts.errors import PartsError
+from craft_parts.packages.platform import is_rpm_based
 from craft_parts.parts import PartSpec
 from xdg import BaseDirectory  # type: ignore
 
@@ -149,13 +150,24 @@ class CharmPlugin(plugins.Plugin):
 
     def get_build_packages(self) -> Set[str]:
         """Return a set of required packages to install in the build environment."""
-        return {
-            "python3-pip",
-            "python3-setuptools",
-            "python3-wheel",
-            "python3-venv",
-            "python3-dev",
-        }
+        if is_rpm_based():
+            # the 'venv' module is included in the base libs:
+            #   https://centos.pkgs.org/7/centos-x86_64/python3-libs-3.6.8-17.el7.x86_64.rpm.html
+            packages = {
+                "python3-pip",
+                "python3-setuptools",
+                "python3-wheel",
+                "python3-devel",
+            }
+        else:
+            packages = {
+                "python3-pip",
+                "python3-setuptools",
+                "python3-wheel",
+                "python3-venv",
+                "python3-dev",
+            }
+        return packages
 
     def get_build_environment(self) -> Dict[str, str]:
         """Return a dictionary with the environment to use in the build step."""
