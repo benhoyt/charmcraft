@@ -51,7 +51,7 @@ install_requires = [
 # which is not present in armhf, ppc64el and s390x architectures.
 
 dev_requires = [
-    "black",
+    "black==23.1.0",
     "coverage",
     "flake8",
     "ops>=1.4.0",
